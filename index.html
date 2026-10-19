@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رسالة منحة وبيان شحن</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--ink:#12303b;--brass:#a8843a;--line:#d9d3c3;--bg:#eef0f0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Cairo,sans-serif;color:var(--ink)}
+.app{display:grid;grid-template-columns:380px 1fr;gap:24px;padding:24px;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);padding:20px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+.panel h2{margin:0 0 12px;font-size:18px}
+.panel h3{margin:18px 0 8px;font-size:14px;color:var(--brass)}
+label{display:block;font-size:13px;margin:8px 0 3px}
+input,select{width:100%;padding:8px;border:1px solid var(--line);font:inherit;font-size:14px;background:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fee{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.btns{display:flex;gap:8px;margin-top:18px}
+button{flex:1;padding:10px;border:0;background:var(--ink);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+button.alt{background:var(--brass)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.stage{overflow:auto;display:flex;justify-content:center}
+#doc{width:794px;height:1123px;background:#fff;padding:48px 56px;font-family:Amiri,serif;position:relative;flex:none;border:1px solid var(--line);display:flex;flex-direction:column}
+#doc .head{display:flex;align-items:center;justify-content:space-between;border-bottom:3px double var(--brass);padding-bottom:14px}
+#doc .head img{height:70px;max-width:180px;object-fit:contain}
+#doc .org{font-size:22px;font-weight:700}
+#doc .meta{font-size:14px;text-align:left;line-height:1.7}
+#doc h1{text-align:center;font-size:32px;margin:20px 0 6px;color:var(--ink)}
+#doc .sub{text-align:center;font-size:16px;margin-bottom:16px;color:#555}
+#doc p{font-size:17px;line-height:1.9;margin:0 0 10px;text-align:justify}
+.ben{display:flex;gap:16px;align-items:flex-start;margin:6px 0 12px}
+.ben .photo{width:110px;height:130px;border:1px solid var(--line);object-fit:cover;flex:none;background:#f6f6f4}
+table{width:100%;border-collapse:collapse;font-size:16px;margin-bottom:12px}
+th,td{border:1px solid var(--line);padding:5px 9px;text-align:right}
+th{background:#f3efe4;width:28%;font-weight:700}
+.fees th{width:auto}
+.route{display:flex;align-items:center;gap:6px;margin:4px 0 12px;font-size:16px}
+.route span{flex:1;text-align:center;border:1px solid var(--brass);padding:6px 4px}
+.route i{color:var(--brass);font-style:normal}
+.sign{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end}
+.sign div{text-align:center;font-size:16px;min-width:200px}
+.sign .ln{border-bottom:1px solid var(--ink);height:70px;margin-bottom:4px;display:flex;align-items:flex-end;justify-content:center}.sign .ln img{max-height:66px;max-width:200px;object-fit:contain}
+.note{font-size:12px;color:#666;border-top:1px solid var(--line);margin-top:12px;padding-top:6px;text-align:center}
+@media(max-width:1250px){.app{grid-template-columns:1fr}.panel{position:static;max-height:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="panel">
+  <h2>بيانات الوثيقة</h2>
+  <h3>المانح</h3>
+  <label>اسم المانح / المؤسسة</label><input id="giver" value="">
+  <label>رقم الوثيقة</label><input id="ref" value="">
+  <label>التاريخ</label><input id="date" type="date">
+  <h3>المستفيد</h3>
+  <label>الاسم</label><input id="name">
+  <label>العنوان</label><input id="addr">
+  <label>الصورة</label><input id="photo" type="file" accept="image/*">
+  <h3>السيارة</h3>
+  <div class="row"><div><label>النوع</label><input id="car" value="تويوتا لاند كروزر"></div><div><label>اللون</label><input id="color" value="أبيض"></div></div>
+  <div class="row"><div><label>سنة الصنع</label><input id="year" value="2024"></div><div><label>القيمة</label><input id="value"></div></div>
+  <label>المنشأ</label><input id="origin">
+  <h3>مسار التسليم</h3>
+  <label>الميناء / النقاط (واحدة بكل سطر)</label>
+  <input id="r1" value="ميناء جدة"><input id="r2" value="البحر الأحمر" style="margin-top:4px"><input id="r3" value="ميناء العقبة - الأردن" style="margin-top:4px"><input id="r4" value="معبر جابر - نصيب" style="margin-top:4px"><input id="r5" value="تسليم المستفيد - سوريا" style="margin-top:4px">
+  <h3>الرسوم</h3>
+  <div class="fee"><input id="f1" value="رسوم النقل"><input id="a1" placeholder="المبلغ"><select id="s1"><option>مدفوعة</option><option>غير مدفوعة</option></select></div>
+  <div class="fee"><input id="f2" value="رسوم الشحن"><input id="a2" placeholder="المبلغ"><select id="s2"><option>مدفوعة</option><option>غير مدفوعة</option></select></div>
+  <div class="fee"><input id="f3" value="رسوم الجمركة"><input id="a3" placeholder="المبلغ"><select id="s3"><option>مدفوعة</option><option>غير مدفوعة</option></select></div>
+  <div class="btns"><button onclick="exp('pdf')">تصدير PDF</button><button class="alt" onclick="exp('png')">تصدير PNG</button></div>
+</div>
+
+<div class="stage"><div id="doc">
+  <div class="head">
+    <div><img id="logo" crossorigin="anonymous" alt=""><div class="org" id="o-giver"></div><img id="nameImg" crossorigin="anonymous" alt="" style="display:none;height:54px;max-width:240px;object-fit:contain"></div>
+    <div class="meta">رقم الوثيقة: <b id="o-ref"></b><br>التاريخ: <b id="o-date"></b></div>
+  </div>
+  <h1>وثيقة تسليم ـ مؤسسة الوليد بن طلال</h1>
+  <div class="ben">
+    <img class="photo" id="o-photo" alt="" style="display:none">
+    <p>يسرّ <b id="o-giver2"></b> أن نعلن منح السيد/ة <b id="o-name"></b>، المقيم/ة في <b id="o-addr"></b>، السيارة الموضحة بياناتها أدناه، وفق تفاصيل النقل والتسليم والرسوم المبيّنة في هذه الرسالة.</p>
+  </div>
+  <table>
+    <tr><th>نوع السيارة</th><td id="o-car"></td><th>اللون</th><td id="o-color"></td></tr>
+    <tr><th>سنة الصنع</th><td id="o-year"></td><th>القيمة</th><td id="o-value"></td></tr>
+    <tr><th>المنشأ</th><td colspan="3" id="o-origin"></td></tr>
+  </table>
+  <p><b>مسار النقل والتسليم</b></p>
+  <div class="route" id="o-route"></div>
+  <p><b>الرسوم</b></p>
+  <table class="fees"><thead><tr><th>البند</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody id="o-fees"></tbody></table>
+  <div class="sign"><div><div class="ln"><img id="sigImg" crossorigin="anonymous" alt="" style="display:none"></div>توقيع المانح</div><div><div class="ln"></div>اسم المانح: <span id="o-giver3"></span></div></div>
+  <div class="note">هذه رسالة صادرة عن المانح المذكور أعلاه وليست وثيقة حكومية. للاستفسار تواصل مع المانح مباشرة.</div>
+</div></div>
+</div>
+
+<script>
+// ضع رابط الشعار هنا
+const LOGO_URL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnQ_sKrkDqSqbc9bLqfqpCD9ZjsTdhFvqbo03qiyt4wA&s=10";
+// رابط صورة اسم المانح (اختياري، إذا وضعته يظهر بدل الاسم المكتوب بالترويسة)
+const GIVER_NAME_IMG_URL = "";
+// رابط صورة التوقيع (ثابتة بالوثيقة)
+const SIGNATURE_URL = "https://i.imgur.com/UshOlD0.png";
+
+const $ = id => document.getElementById(id);
+const set = (o, v) => $(o).textContent = v || "";
+function render(){
+  set("o-giver",$("giver").value); set("o-giver2",$("giver").value); set("o-giver3",$("giver").value);
+  set("o-ref",$("ref").value); set("o-name",$("name").value); set("o-addr",$("addr").value);
+  set("o-date",$("date").value ? new Date($("date").value).toLocaleDateString("ar-JO") : "");
+  ["car","color","year","value","origin"].forEach(k=>set("o-"+k,$(k).value));
+  $("o-route").innerHTML = [1,2,3,4,5].map(i=>$("r"+i).value).filter(Boolean).map(t=>"<span>"+t.replace(/</g,"&lt;")+"</span>").join("<i>◄</i>");
+  $("o-fees").innerHTML = [1,2,3].map(i=>"<tr><td>"+$("f"+i).value.replace(/</g,"&lt;")+"</td><td>"+($("a"+i).value||"—").replace(/</g,"&lt;")+"</td><td>"+$("s"+i).value+"</td></tr>").join("");
+}
+document.querySelectorAll(".panel input,.panel select").forEach(e=>e.addEventListener("input",render));
+$("date").valueAsDate = new Date();
+$("photo").addEventListener("change",e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => { $("o-photo").src = r.result; $("o-photo").style.display = "block"; };
+  r.readAsDataURL(f);
+});
+if (LOGO_URL) $("logo").src = LOGO_URL; else $("logo").style.display = "none";
+if (GIVER_NAME_IMG_URL) { $("nameImg").src = GIVER_NAME_IMG_URL; $("nameImg").style.display = "block"; $("o-giver").style.display = "none"; }
+if (SIGNATURE_URL) { $("sigImg").src = SIGNATURE_URL; $("sigImg").style.display = "block"; }
+render();
+
+async function exp(type){
+  await document.fonts.ready;
+  const canvas = await html2canvas($("doc"),{scale:2,useCORS:true,backgroundColor:"#fff"});
+  if(type==="png"){
+    const a = document.createElement("a");
+    a.href = canvas.toDataURL("image/png"); a.download = "grant-letter.png"; a.click();
+  } else {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({unit:"mm",format:"a4"});
+    pdf.addImage(canvas.toDataURL("image/jpeg",0.95),"JPEG",0,0,210,297);
+    pdf.save("grant-letter.pdf");
+  }
+}
+</script>
+</body>
+</html>
